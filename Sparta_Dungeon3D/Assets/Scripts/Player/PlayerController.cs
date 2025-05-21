@@ -7,8 +7,19 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float speed;
+    public float jumpForce;
     //Input Action에서 받아올 값
     private Vector2 curMovementInput;
+    public LayerMask groundLayerMask;
+
+    [Header("Look")]
+    public float minXLook;
+    public float maxXLook;
+    private float camCurXRot;
+    public float lookSensitivity;
+    private Vector2 mouseDelta;
+    public Transform cameraContainer;
+
 
     private Rigidbody _rigidbody;
 
@@ -17,17 +28,21 @@ public class PlayerController : MonoBehaviour
         _rigidbody = GetComponent<Rigidbody>();
     }
 
-    private void Start()
+    void Start()
     {
         //마우스 커서 없엠
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    private void Update()
+    void FixedUpdate()
     {
         Move();
     }
 
+    private void LateUpdate()
+    {
+        CameraLook();
+    }
     void Move()
     {
         Vector3 dir = transform.forward * curMovementInput.y + transform.right * curMovementInput.x;
@@ -37,10 +52,20 @@ public class PlayerController : MonoBehaviour
         _rigidbody.velocity = dir;
     }
 
+    void CameraLook()
+    {
+        camCurXRot += mouseDelta.y * lookSensitivity;
+        //최대값과 최소값 반환
+        camCurXRot = Mathf.Clamp(camCurXRot, minXLook, maxXLook);
+        cameraContainer.transform.localEulerAngles = new Vector3(-camCurXRot, 0, 0);
+
+        transform.eulerAngles += new Vector3(0, mouseDelta.x * lookSensitivity, 0);
+    }
+
     public void OnMove(InputAction.CallbackContext context)
     {
         //키가 눌렸을 때 상태를 받아오기 위헤 Started 사용
-        if(context.phase == InputActionPhase.Started)
+        if(context.phase == InputActionPhase.Performed)
         {
             //현재 Vector2값을 받아옴.
             curMovementInput = context.ReadValue<Vector2>();
@@ -49,5 +74,39 @@ public class PlayerController : MonoBehaviour
         {
             curMovementInput = Vector2.zero;
         }
+    }
+
+    public void OnJump(InputAction.CallbackContext context)
+    {
+        if(context.phase == InputActionPhase.Started && isGrounded())
+        { 
+            _rigidbody.AddForce(Vector2.up * jumpForce, ForceMode.Impulse);
+        }
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        mouseDelta = context.ReadValue<Vector2>();
+    }
+
+    bool isGrounded()
+    {
+        Ray[] rays = new Ray[4]
+        {
+            new Ray(transform.position + (transform.forward * 0.2f) + (transform.up * 0.01f), Vector3.down),
+            new Ray(transform.position + (-transform.forward * 0.2f) + (transform.up * 0.01f), Vector3.down),
+            new Ray(transform.position + (transform.right * 0.2f) + (transform.up * 0.01f), Vector3.down),
+            new Ray(transform.position + (-transform.right * 0.2f) + (transform.up * 0.01f), Vector3.down)
+        };
+
+        for (int i = 0; i < rays.Length; i++)
+        {
+            if (Physics.Raycast(rays[i], 0.1f, groundLayerMask))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
