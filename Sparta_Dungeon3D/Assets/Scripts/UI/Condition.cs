@@ -31,11 +31,11 @@ public class Condition : MonoBehaviour
     public void Add(float value)
     {
         //더 작은 값을 반환함.
-        curValue += Mathf.Min(curValue + value, maxValue);
+        curValue = Mathf.Min(curValue + value, maxValue);
     }
 
     public void Subtract(float value)
     {
-        curValue -= Mathf.Max(curValue - value, 0);
+        curValue = Mathf.Max(curValue - value, 0);
     }
 }

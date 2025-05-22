@@ -15,5 +15,9 @@ MonoBehaviour:
   displayName: Soda
   description: Press E to drink
   type: 0
-  icon: {fileID: 0}
-  consumables: []
+  icon: {fileID: 21300000, guid: 3c6bfc4d9ea5bc6439febb796b5961d3, type: 3}
+  canStack: 1
+  maxStackAmount: 12
+  consumables:
+  - type: 1
+    value: 10

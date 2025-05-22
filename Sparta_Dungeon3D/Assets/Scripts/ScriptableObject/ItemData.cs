@@ -11,7 +11,8 @@ public enum ItemType
 
 public enum ConsumableType
 {
-    Health
+    Health,
+    Stamina
 }
 
 [Serializable]
@@ -29,6 +30,10 @@ public class ItemData : ScriptableObject
     public string description;
     public ItemType type;
     public Sprite icon;
+
+    [Header("Stacking")]
+    public bool canStack;
+    public int maxStackAmount;
 
     [Header("Consumable")]
     public ItemDataConsumable[] consumables;
