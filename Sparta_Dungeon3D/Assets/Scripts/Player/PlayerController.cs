@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float speed;
+    private float defaultSpeed;
     public float jumpForce;
     //Input Action에서 받아올 값
     private Vector2 curMovementInput;
@@ -33,6 +34,7 @@ public class PlayerController : MonoBehaviour
     {
         //마우스 커서 없엠
         Cursor.lockState = CursorLockMode.Locked;
+        defaultSpeed = speed;
     }
 
     void FixedUpdate()
@@ -128,5 +130,16 @@ public class PlayerController : MonoBehaviour
         bool toggle = Cursor.lockState == CursorLockMode.Locked;
         Cursor.lockState = toggle ? CursorLockMode.None : CursorLockMode.Locked;
         canLook = !toggle;
+    }
+    public void UseSpeedItem(float boostAmount, float duration)
+    {
+        StartCoroutine(SpeedBoostCoroutine(boostAmount, duration));
+    }
+
+    private IEnumerator SpeedBoostCoroutine(float boostAmount, float duration)
+    {
+        speed *= boostAmount;
+        yield return new WaitForSeconds(duration);
+        speed = defaultSpeed;
     }
 }
